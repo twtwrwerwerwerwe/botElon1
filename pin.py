@@ -3,24 +3,23 @@ from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filte
 import logging
 
 TOKEN = "8557981769:AAEbSlXKLxLtAW8c4iMDtyOoxitjs-kDlVE"
-
-# PIN QILINADIGAN BOT USERNAME ( @siz yoziladi )
 TARGET_BOT_USERNAME = "rishtonBogdodToshkentTaxi_bot"
 
 logging.basicConfig(level=logging.INFO)
 
-async def pin_only_target_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def pin_target_bot_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message or update.channel_post
     if not message:
         return
 
-    # from_user bo‘lmasa — chiqib ketamiz
-    if not message.from_user:
-        return
-
-    # ❗ FAQAT ANIQ BOT USERNAME
-    if message.from_user.username != TARGET_BOT_USERNAME:
-        return
+    # 🔹 from_user mavjud va username mos bo‘lsa
+    if message.from_user and message.from_user.username == TARGET_BOT_USERNAME:
+        pass
+    # 🔹 sender_chat mavjud va username mos bo‘lsa (anonymous admin botlar uchun)
+    elif message.sender_chat and message.sender_chat.username == TARGET_BOT_USERNAME:
+        pass
+    else:
+        return  # boshqa odam yoki bot bo‘lsa, chiqib ketamiz
 
     try:
         await context.bot.pin_chat_message(
@@ -33,8 +32,7 @@ async def pin_only_target_bot(update: Update, context: ContextTypes.DEFAULT_TYPE
         logging.error(f"❌ PIN XATO: {e}")
 
 app = ApplicationBuilder().token(TOKEN).build()
-
-app.add_handler(MessageHandler(filters.ALL, pin_only_target_bot))
+app.add_handler(MessageHandler(filters.ALL, pin_target_bot_message))
 
 print("✅ Bot ishga tushdi")
 
