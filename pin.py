@@ -15,7 +15,7 @@ async def pin_target_bot_message(update: Update, context: ContextTypes.DEFAULT_T
     # 🔹 from_user mavjud va username mos bo‘lsa
     if message.from_user and message.from_user.username == TARGET_BOT_USERNAME:
         pass
-    # 🔹 sender_chat mavjud va username mos bo‘lsa (anonymous admin botlar uchun)
+    # 🔹 sender_chat mavjud va username mos bo‘lsa (anonymous botlar uchun)
     elif message.sender_chat and message.sender_chat.username == TARGET_BOT_USERNAME:
         pass
     else:
@@ -36,6 +36,4 @@ app.add_handler(MessageHandler(filters.ALL, pin_target_bot_message))
 
 print("✅ Bot ishga tushdi")
 
-app.run_polling(
-    allowed_updates=["message", "channel_post"]
-)
+app.run_polling(drop_pending_updates=True, allowed_updates=["message", "channel_post"])
