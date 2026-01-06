@@ -1,22 +1,32 @@
 from telegram import Update
 from telegram.ext import ApplicationBuilder, MessageHandler, ContextTypes, filters
+import logging
 
 TOKEN = "8557981769:AAEbSlXKLxLtAW8c4iMDtyOoxitjs-kDlVE"
 
+logging.basicConfig(level=logging.INFO)
+
 async def pin_new_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.message
-    if message:
-        try:
-            await context.bot.pin_chat_message(
-                chat_id=message.chat.id,
-                message_id=message.message_id,
-                disable_notification=True
-            )
-        except:
-            pass  # agar pin qilolmasa xato bermaydi
+    message = update.message or update.channel_post
+    if not message:
+        return
+
+    try:
+        await context.bot.pin_chat_message(
+            chat_id=message.chat.id,
+            message_id=message.message_id,
+            disable_notification=True
+        )
+        logging.info("📌 PIN QILINDI")
+    except Exception as e:
+        logging.error(f"❌ PIN XATO: {e}")
 
 app = ApplicationBuilder().token(TOKEN).build()
 
 app.add_handler(MessageHandler(filters.ALL, pin_new_message))
 
-app.run_polling()
+print("✅ Bot ishga tushdi")
+
+app.run_polling(
+    allowed_updates=["message", "channel_post"]
+)
